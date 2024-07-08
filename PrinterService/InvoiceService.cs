@@ -1,3 +1,5 @@
+using System.Numerics;
+using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -59,6 +61,7 @@ namespace GenerateRawTextToPrint
             var patientAndInvoiceInfoSectionSettings = JsonConvert.DeserializeObject<Dictionary<string, FieldSetting>>(patientAndInvoiceInfoSettings);
             var InvoiceFieldWidth = JsonConvert.DeserializeObject<Dictionary<string, int>>(invoiceItemCharacterWidth);
             var invoiceItems = JsonConvert.DeserializeObject(invoiceItemsData);
+            BillTotal billTotal = JsonConvert.DeserializeObject<BillTotal>(BillTotalDetail);
 
             //checking if the invoiceItemCharacterWidth is exceeding printable character width
             if (InvoiceFieldWidth.Values.Sum() > printableCharacters)
@@ -71,7 +74,7 @@ namespace GenerateRawTextToPrint
                 return string.Empty;
             }
 
-            return BuildRawInvoiceText(patientAndInvoiceInfoData, patientAndInvoiceInfoSectionSettings, invoiceItems, printableCharacters, InvoiceFieldWidth);
+            return BuildRawInvoiceText(patientAndInvoiceInfoData, patientAndInvoiceInfoSectionSettings, invoiceItems, printableCharacters, InvoiceFieldWidth, billTotal);
         }
         /// <summary>
         /// Builds the raw text for an invoice.
@@ -82,7 +85,7 @@ namespace GenerateRawTextToPrint
         /// <param name="printableCharacters">Number of printable characters per line.</param>
         /// <param name="invoiceFieldColumnWidth">Dictionary containing column width for invoice items.</param>
         /// <returns>Raw text string for the invoice.</returns>
-        private string BuildRawInvoiceText(Dictionary<string, Field> data, Dictionary<string, FieldSetting> settings, dynamic invoiceItems, int printableCharacters, Dictionary<string, int> invoiceFieldColumnWidth)
+        private string BuildRawInvoiceText(Dictionary<string, Field> data, Dictionary<string, FieldSetting> settings, dynamic invoiceItems, int printableCharacters, Dictionary<string, int> invoiceFieldColumnWidth, BillTotal billTotal)
         {
             PrintHeader(crlf, HeaderLines);
 
@@ -99,6 +102,7 @@ namespace GenerateRawTextToPrint
 
             // Print invoice items
             PrintInvoiceItems(invoiceItems, printableCharacters, invoiceFieldColumnWidth);
+            PrintBillTotalSection(billTotal, printableCharacters, invoiceFieldColumnWidth);
 
             return rawTextString.ToString();
         }
@@ -180,6 +184,30 @@ namespace GenerateRawTextToPrint
         /// <param name="styling">Styling to be applied.</param>
         /// <returns>Styled text.</returns>
 
+        private void PrintBillTotalSection(BillTotal billTotal, int printableCharacters, Dictionary<string, int> colWidth)
+        {
+            int totalColWidth = colWidth.Values.Sum();
+            // Type type = typeof(BillTotal);
+            // PropertyInfo[] properties= type.GetProperties();
+            // foreach(PropertyInfo property in properties)
+            // {
+            //     string rowData= property.ToString().PadRight(totalColWidth)+crlf;
+            //     rawTextString.Append(rowData);
+            // }
+            string subTotal = (ApplyTextStyles("Sub Total: ",TextStyling.Bold)+billTotal.SubTotal.ToString()).PadLeft(totalColWidth)+crlf;
+            string dis= (ApplyTextStyles("Discount %: ",TextStyling.Bold)+billTotal.Dis.ToString()).PadLeft(totalColWidth)+crlf;
+            string totalAmt= (ApplyTextStyles("Total Amount: ",TextStyling.Bold)+billTotal.NetTotal.ToString()).PadLeft(totalColWidth)+crlf;
+            string amtInWords = (ApplyTextStyles("Amount In Words: ",TextStyling.Bold)+billTotal.AmountInWords).PadLeft(totalColWidth)+crlf;
+
+            rawTextString.Append(subTotal);
+            CheckPageEnd();
+            rawTextString.Append(dis);
+            CheckPageEnd();
+            rawTextString.Append(totalAmt);
+            CheckPageEnd();
+            rawTextString.Append(amtInWords);
+            CheckPageEnd(); 
+        }
         private string ApplyTextStyles(string text, TextStyling styling)
         {
             StringBuilder lineText = new StringBuilder(text);

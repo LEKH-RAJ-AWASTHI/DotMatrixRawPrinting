@@ -19,5 +19,5 @@ public class BillTotal
     /// <summary>
     /// Net total amount in words
     /// </summary>
-    public decimal AmountInWords;
+    public string AmountInWords;
 }

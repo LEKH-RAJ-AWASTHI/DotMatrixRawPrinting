@@ -11,14 +11,14 @@ using PrintingRaw;
 // printer.SendCommandBytes(bytes);
 var PrinterSetting = @"{
                     'PrinterName': 'EPSON LQ-310 ESC/P2',
-                    'PageLengthMM': '150',
+                    'PageLengthMM': '210',
                     'pageWidthMM': '230',
                     'LeftMarginMM': '10',
                     'RightMarginMM': '10',
                     'TopMarginMM': '15',
                     'BottomMarginMM': '15',
-        'Pitch': '10',
-        'lineSpacing': '6',
+                    'Pitch': '10',
+                    'lineSpacing': '6',
                     'HeaderHeightMM': '10',
                     'FooterHeightMM': '10'
     }";
@@ -115,11 +115,11 @@ var BillTotalDetail= @"{
             'NetTotal': '1250',
             'AmountInWords':'One Thousand Two Hundred and Fifty only'
             }";
-var DisplayOrder= @"{
-            'patientAndinvoiceDetails': '1',
-            'invoiceItemsData': '2',
-            'BillTotalDetail': '3'
-        }";
+// var DisplayOrder= @"{
+//             'patientAndinvoiceDetails': '1',
+//             'invoiceItemsData': '2',
+//             'BillTotalDetail': '3'
+//         }";
 PrinterConfig pConfig = JsonConvert.DeserializeObject<PrinterConfig>(PrinterSetting);
 PrintService setPrinter = new PrintService(pConfig);
 int linesPerPage = setPrinter.NumberOfLinesPerPage();

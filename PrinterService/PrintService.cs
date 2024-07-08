@@ -237,9 +237,23 @@ namespace PrintingRaw
             SetYMargin();
             SelectFont();
             _printer.SendCommand(printText + crlf);
-            // _printer.SendCommand("\x0C");
+            _printer.SendCommand("Hello                     "+crlf);
+            _printer.SendCommand("\x0C");
             InitializePrinter();
+            // _printer.SendCommand(emphasized+"A quick brown fox jumps"+emphasizedCancel+" over the lazy dog."+crlf);
+            // _printer.SendCommand(double_strike+"A quick brown fox jumps"+double_strike_cancel+" over the lazy dog."+crlf);
+            // _printer.SendCommand(proportionalMode+"A quick brown fox jumps"+proportionalModeCancel+" over the lazy dog."+crlf);
+            // _printer.SendCommand(condensed+"A quick brown fox jumps"+cancelCondensed+" over the lazy dog."+crlf);
+            // _printer.SendCommand(doubleWidth+"A quick brown fox jumps"+doublWidthCancel+" over the lazy dog."+crlf);
+            // _printer.SendCommand(superScript+"A quick brown fox jumps"+subScript+" over the lazy dog."+crlf);
+            // _printer.SendCommand(doubleHeight+"A quick brown fox jumps"+doubleHeightCancel+" over the lazy dog."+crlf);
+            // _printer.SendCommand("2"+superScript+"2"+normalizeCommand+ " is 4."+crlf);
+            // _printer.SendCommand("11001110101010"+subScript+"2"+normalizeCommand+" is 1973"+crlf);
         }
+            // _printer.SendCommand("A quick brown fox jumps over the lazy dog."+crlf);
+            // _printer.SendCommand("A quick brown fox jumps over the lazy dog."+crlf);
+            // _printer.SendCommand("A quick brown fox jumps over the lazy dog."+crlf);
+            // _printer.SendCommand("A quick brown fox jumps over the lazy dog."+crlf);
 
         #region Utility Functions
         /// <summary>
@@ -281,5 +295,21 @@ namespace PrintingRaw
             return (int)footerLines + 1;
         }
         #endregion
+    string emphasized= "\x1B\x45";
+    string emphasizedCancel = "\x1B\x46";
+    string double_strike= "\x1B\x47";
+    string double_strike_cancel = "\x1B\x48";
+    string proportionalMode = "\x1B\x70\x31";
+    string proportionalModeCancel = "\x1B\x70\x30";
+    string condensed ="\x0F";
+    string cancelCondensed = "\x12";
+    string doubleWidth = "\x0E";
+    string doublWidthCancel ="\x14";
+    string superScript = "\x1B\x53\x30";
+    string subScript ="\x1B\x53\x31";
+    string normalizeCommand = "\x1B\x54";
+    string doubleHeight= "\x1B\x77\x31";
+    string doubleHeightCancel = "\x1B\x77\x30";
+    
     }
 }
