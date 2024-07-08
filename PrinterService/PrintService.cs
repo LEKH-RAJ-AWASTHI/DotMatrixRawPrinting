@@ -3,23 +3,70 @@ using System.Drawing.Printing;
 
 namespace PrintingRaw
 {
+    /// <summary>
+    /// Class that provide service for setting up page, sending print command to printer and some utility functions
+    /// </summary>
     public class PrintService
     {
+        /// <summary>
+        /// CRLF is short form of carriage return and line feed.
+        /// </summary>
         private static readonly string crlf = "\x0D\x0A";
+        /// <summary>
+        /// Object of Printer class which send data to the printer
+        /// </summary>
         private readonly Printer _printer;
+        /// <summary>
+        /// Variable that defines the unit which help in setting margins and length of page.
+        /// </summary>
         private int definedUnit;
+        /// <summary>
+        /// Name of the printer
+        /// </summary>
         private string PrinterName;
+        /// <summary>
+        /// ESC is the command. Mostly command in the ESC/P2 starts with ESC i.e. \x1B
+        /// </summary>
         private string ESC = "\x1B";
-
+        /// <summary>
+        /// Length of page in inch.
+        /// </summary>
         private double pageLengthInch;
+        /// <summary>
+        /// Width of page in inch.
+        /// </summary>
         private double pageWidthInch;
+        /// <summary>
+        /// Left margin calculated in inch.
+        /// </summary>
         private double leftMarginInch;
+        /// <summary>
+        /// right margin calculated in inch
+        /// </summary>
         private double rightMarginInch;
+        /// <summary>
+        /// top margin calculated in inch
+        /// </summary>
         private double topMarginInch;
+        /// <summary>
+        /// bottom margin calculated in inch
+        /// </summary>
         private double bottomMarginInch;
+        /// <summary>
+        /// Integer value of the characters per inch (CPI). Available values are 10, 12, 15
+        /// </summary>
         private int pitch; // Characters per inch
+        /// <summary>
+        /// Line spacing number of line per inch in the page. Available values are 6, 8
+        /// </summary>
         private int lineSpacing; // Lines per inch
+        /// <summary>
+        /// Header height measured in inch
+        /// </summary>
         private double headerHeightInch;
+        /// <summary>
+        /// footer height measured in inch
+        /// </summary>
         private double footerHeightInch;
 
         public PrintService(PrinterConfig p)
@@ -37,23 +84,32 @@ namespace PrintingRaw
             this.PrinterName = p.PrinterName;
             _printer = new Printer(PrinterName);
         }
-
+        /// <summary>
+        /// Functions that will convert mm into inches.
+        /// </summary>
+        /// <param name="mmSize"></param>
+        /// <returns></returns>
         private double ConvertMMtoInches(double mmSize)
         {
             return mmSize / 25.4;
         }
-
+        
         #region Initialize and Reset Printer
-        private string InitializePrinter()
+        /// <summary>
+        /// Fucntion that initialize printer. Resets all previous settings
+        /// </summary>
+        private void InitializePrinter()
         {
             string initializePrinter = "\x1B\x40";
             _printer.SendCommand(initializePrinter);
-            return initializePrinter;
         }
         #endregion
 
         #region Setting Page In Printer
-        private string SetLineSpacing()
+        /// <summary>
+        /// Send command to printer to set Line spacing.
+        /// </summary>
+        private void SetLineSpacing()
         {
             string lineSpacingCmd = ESC;
             switch (lineSpacing)
@@ -69,10 +125,11 @@ namespace PrintingRaw
                     break;
             }
             _printer.SendCommand(lineSpacingCmd);
-            return lineSpacingCmd;
         }
-
-        private string SetPitchCPI()
+        /// <summary>
+        /// Send command to printer to set the pitch.
+        /// </summary>
+        private void SetPitchCPI()
         {
             string selectCPI = ESC;
             switch (pitch)
@@ -91,34 +148,39 @@ namespace PrintingRaw
                     break;
             }
             _printer.SendCommand(selectCPI);
-            return selectCPI;
         }
-
-        private string DefineUnit()
+        /// <summary>
+        /// Send command to define unit for measuring length and width of page.
+        /// </summary>
+        /// <returns></returns>
+        private void DefineUnit()
         {
             string unit = "\x1B\x28\x55\x01\x00\x0A";
             definedUnit = 360;
             _printer.SendCommand(unit);
-            return unit;
         }
-
-        private string SetLeftMargin()
+        /// <summary>
+        /// Send Command to printer to set left margin.
+        /// </summary>
+        private void SetLeftMargin()
         {
             int numberOfCharacters = (int)(leftMarginInch * pitch);
             byte[] setLeftMargin = { 0x1B, 0x6C, (byte)numberOfCharacters };
             _printer.SendCommandBytes(setLeftMargin);
-            return string.Format("\\x1B\\x6C\\x{0:X2}", numberOfCharacters);
         }
-
-        private string SetRightMargin()
+        /// <summary>
+        /// Send Command to printer to set right margin.
+        /// </summary>
+        private void SetRightMargin()
         {
             int numberOfCharacters = (int)((pageWidthInch - rightMarginInch) * pitch);
             byte[] setRightMargin = { 0x1B, 0x51, (byte)numberOfCharacters };
             _printer.SendCommandBytes(setRightMargin);
-            return string.Format("\\x1B\\x51\\x{0:X2}", numberOfCharacters);
         }
-
-        private string SetPageLength()
+        /// <summary>
+        /// Send Command to printer to set page Length.
+        /// </summary>
+        private void SetPageLength()
         {
             double pageLengthUnits = pageLengthInch * definedUnit;
             int nL = 2;
@@ -127,10 +189,11 @@ namespace PrintingRaw
             int mH = (int)pageLengthUnits / 256;
             byte[] bytes = { 0x1B, 0x28, 0x43, (byte)nL, (byte)nH, (byte)mL, (byte)mH };
             _printer.SendCommandBytes(bytes);
-            return string.Format("\\x1B\\x28\\x43\\x{0:X2}\\x{1:X2}\\x{2:X2}\\x{3:X2}", nL, nH, mL, mH);
         }
-
-        private string SetYMargin()
+        /// <summary>
+        /// Send Command to printer to set top and bottom margin.
+        /// </summary>
+        private void SetYMargin()
         {
             double topMarginUnits = topMarginInch * definedUnit;
             int th = (int)topMarginUnits / 256;
@@ -148,17 +211,20 @@ namespace PrintingRaw
                 0x1B, 0x28, 0x63, nL, nH, (byte)tl, (byte)th, (byte)bl, (byte)bh
             };
             _printer.SendCommandBytes(setMarginsCommand);
-            return string.Format("\\x1B\\x28\\x63\\x{0:X2}\\x{1:X2}\\x{2:X2}\\x{3:X2}\\x{4:X2}\\x{5:X2}", nL, nH, tl, th, bl, bh);
         }
-
-        private string SelectFont()
+        /// <summary>
+        /// Send Command to printer to select font.
+        /// </summary>
+        private void SelectFont()
         {
             string selectFont = "\x1B\x4B\x39";
             _printer.SendCommand(selectFont);
-            return selectFont;
         }
         #endregion
-
+        /// <summary>
+        /// Function that helps to execute all required function and send raw text to printer.
+        /// </summary>
+        /// <param name="printText">String that is processed with escp commands for formatting</param>
         public void PrintRawText(string printText)
         {
             InitializePrinter();
@@ -176,26 +242,39 @@ namespace PrintingRaw
         }
 
         #region Utility Functions
+        /// <summary>
+        /// Function that calculates and return number of printable characters per line.
+        /// </summary>
+        /// <returns>Integer variable of number of printable characters per line</returns>
         public int NumberOfPrintableCharacters()
         {
             double printableWidth = pageWidthInch - rightMarginInch - leftMarginInch;
             double printableCharacters = printableWidth * pitch;
             return (int)printableCharacters;
         }
-
+        /// <summary>
+        /// Function that calculates and return number of lines per Page.
+        /// </summary>
+        /// <returns>Integer variable of number of lines per Page</returns>
         public int NumberOfLinesPerPage()
         {
             double printableHeight = pageLengthInch - topMarginInch - bottomMarginInch;
             double printableLines = printableHeight * lineSpacing;
             return (int)printableLines;
         }
-
+        /// <summary>
+        /// Function that calculates and return number of lines occupied header.
+        /// </summary>
+        /// <returns>Integer variable of number of lines occupied header</returns>
         public int HeaderHeightLines()
         {
             double headerLines = headerHeightInch * lineSpacing;
             return (int)headerLines + 1;
         }
-
+        /// <summary>
+        /// Function that calculates and return number of lines occupied footer.
+        /// </summary>
+        /// <returns>Integer variable of number of lines occupied footer</returns>
         public int FooterHeightLines()
         {
             double footerLines = footerHeightInch * lineSpacing;

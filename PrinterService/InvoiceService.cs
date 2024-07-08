@@ -10,11 +10,29 @@ namespace GenerateRawTextToPrint
     /// </summary>
     public class InvoiceService
     {
+        /// <summary>
+        /// CurrentLine is variable that will help to track the current line in the page. And will help to find end of the page.
+        /// </summary>
         private int currentLine = 0;
+        /// <summary>
+        /// Number of lines per page
+        /// </summary>
         private int numberOfLines = 0;
+        /// <summary>
+        /// Number of characters printed in a line.
+        /// </summary>
         private int LinePrintableCharacters;
+        /// <summary>
+        /// Number of lines in a page that will occupy the header.
+        /// </summary>
         private int HeaderLines;
+        /// <summary>
+        /// Number of line in a page that will occupy footer.
+        /// </summary>
         private int FooterLines;
+        /// <summary>
+        /// CRLF is short form of carriage return and line feed.
+        /// </summary>
         private readonly string crlf = string.Format("\x0D\x0A");
         private StringBuilder rawTextString = new StringBuilder();
 
