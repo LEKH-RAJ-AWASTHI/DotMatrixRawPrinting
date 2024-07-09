@@ -1,5 +1,3 @@
-using System.Numerics;
-using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -170,11 +168,11 @@ namespace GenerateRawTextToPrint
                     rawTextString.Append(Helper.FormatRow(rowData, printableCharacters, colWidth));
                     CheckPageEnd();
                 }
-                int totalWidth= colWidth.Sum(kv => kv.Value); // calculates the total width of the column in the invoice item.
-                int eachSideWidth = totalWidth/2;
-                string lineLeftText = ApplyTextStyles("Total Amount", TextStyling.Bold) + ": ";
-                // string lineRightText = ApplyTextStyles(TotalAmt.ToString(), TextStyling.Bold);
-                rawTextString.AppendFormat($"{{0,{totalWidth}}}\x0A", lineLeftText+ TotalAmt);
+                // int totalWidth= colWidth.Sum(kv => kv.Value); // calculates the total width of the column in the invoice item.
+                // int eachSideWidth = totalWidth/2;
+                // string lineLeftText = ApplyTextStyles("Total Amount", TextStyling.Bold) + ": ";
+                // // string lineRightText = ApplyTextStyles(TotalAmt.ToString(), TextStyling.Bold);
+                // rawTextString.AppendFormat($"{{0,{totalWidth}}}\x0A", lineLeftText+ TotalAmt);
             }
         }
         /// <summary>
@@ -221,6 +219,7 @@ namespace GenerateRawTextToPrint
                     lineText.Insert(0, "\x1B\x34");
                     lineText.Append("\x1B\x35");
                     break;
+                
                 default:
                     break;
             }
@@ -309,6 +308,7 @@ namespace GenerateRawTextToPrint
         /// </summary>
         /// <param name="headerContent">Header content.</param>
         /// <param name="numberOfLines">Number of header lines.</param>
+        //To do: PrintHeader for now is only adding blank lines but when other parameter come then it can become a big function to print the whole header
         private void PrintHeader(string headerContent, int numberOfLines)
         {
             rawTextString.Append(CenterAlignText(headerContent, LinePrintableCharacters) + crlf);
@@ -323,6 +323,8 @@ namespace GenerateRawTextToPrint
         /// </summary>
         /// <param name="footerContent">Footer content.</param>
         /// <param name="numberOfLines">Number of footer lines.</param>
+        //To do: PrintFooter for now is only adding blank lines but when other parameter come then it can become a big function to print the whole footer
+
         private void PrintFooter(string footerContent, int numberOfLines)
         {
             rawTextString.Append(CenterAlignText(footerContent, LinePrintableCharacters) + crlf);

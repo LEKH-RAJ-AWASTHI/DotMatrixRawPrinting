@@ -1,5 +1,4 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using System.Text;
 using GenerateRawTextToPrint;
 using Newtonsoft.Json;
 using PrintingRaw;
@@ -39,18 +38,18 @@ var patientAndinvoiceDetails = @"{
 
 // Sample settings
 var patientAndInvoiceSettings = @"{
-    'HospitalNo': { 'Position': '20mm;20mm', 'DisplaySeq': '1' },
-    'PatientName': { 'Position': '20mm;40mm', 'DisplaySeq': '2' },
-    'Address': { 'Position': '20mm;60mm', 'DisplaySeq': '5' },
-    'AgeSex': { 'Position': '20mm;80mm', 'DisplaySeq': '7' },
-    'Contact': { 'Position': '20mm;100mm', 'DisplaySeq': '9' },
-    'PolicyNo': { 'Position': '20mm;120mm', 'DisplaySeq': '11' },
-    'Type': { 'Position': '20mm;140mm', 'DisplaySeq': '13' },
-    'InvoiceNo': { 'Position': '105mm;20mm', 'DisplaySeq': '2' },
-    'InvoiceDate': { 'Position': '105mm;40mm', 'DisplaySeq': '4' },
-    'ClaimCode': { 'Position': '105mm;60mm', 'DisplaySeq': '6' },
-    'Department': { 'Position': '105mm;80mm', 'DisplaySeq': '8' },
-    'PaymentMode': { 'Position': '105mm;100mm', 'DisplaySeq': '10' }
+    'HospitalNo': {'DisplaySeq': '1' },
+    'PatientName': {'DisplaySeq': '2' },
+    'Address': {'DisplaySeq': '5' },
+    'AgeSex': {'DisplaySeq': '7' },
+    'Contact': {'DisplaySeq': '9' },
+    'PolicyNo': {'DisplaySeq': '11' },
+    'Type': {'DisplaySeq': '13' },
+    'InvoiceNo': {'DisplaySeq': '2' },
+    'InvoiceDate': {'DisplaySeq': '4' },
+    'ClaimCode': {'DisplaySeq': '6' },
+    'Department': {'DisplaySeq': '8' },
+    'PaymentMode': {'DisplaySeq': '10' }
 }";
 
 var InvoiceItemCharacterWidth= @"
@@ -62,10 +61,6 @@ var InvoiceItemCharacterWidth= @"
     ""DisAmt"": 8,
     ""TotalAmt"": 10
 }";
-// var HeaderFooter=@"{
-// 	'Letterpad': {'height': '50mm', 'lineSpacing': '10'},
-// 	'Footer': {'height': '30mm', 'lineSpacing': '10'}
-// }";
 var invoiceItemsData = @"[
 {
     ""SN"": 1,
@@ -115,6 +110,10 @@ var BillTotalDetail= @"{
             'NetTotal': '1250',
             'AmountInWords':'One Thousand Two Hundred and Fifty only'
             }";
+// var HeaderFooter=@"{
+// 	'Letterpad': {'height': '50mm', 'lineSpacing': '10'},
+// 	'Footer': {'height': '30mm', 'lineSpacing': '10'}
+// }";
 // var DisplayOrder= @"{
 //             'patientAndinvoiceDetails': '1',
 //             'invoiceItemsData': '2',

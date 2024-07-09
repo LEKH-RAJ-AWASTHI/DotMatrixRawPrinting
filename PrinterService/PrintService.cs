@@ -1,7 +1,4 @@
-﻿using System;
-using System.Drawing.Printing;
-
-namespace PrintingRaw
+﻿namespace PrintingRaw
 {
     /// <summary>
     /// Class that provide service for setting up page, sending print command to printer and some utility functions

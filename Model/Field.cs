@@ -20,10 +20,6 @@ public class Field
 public class FieldSetting
 {
     /// <summary>
-    /// position of the Display label in the paper
-    /// </summary>
-    public string Position { get; set; }
-    /// <summary>
     /// Display order of the displayLabel
     /// </summary>
     public string DisplaySeq { get; set; }
