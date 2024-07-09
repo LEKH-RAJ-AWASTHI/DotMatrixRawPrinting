@@ -116,8 +116,8 @@ namespace GenerateRawTextToPrint
 
             for (int i = 0; i < printDetail.Count; i += 2)
             {
-                string lineLeftText = ApplyTextStyles(printDetail[i].DisplayLabel, TextStyling.Bold) + ": " + printDetail[i].Value;
-                string lineRightText = ApplyTextStyles(printDetail[i + 1].DisplayLabel, TextStyling.Bold) + ": " + printDetail[i + 1].Value;
+                string lineLeftText = ApplyTextStyles(printDetail[i].DisplayLabel, TextStyling.bold) + ": " + printDetail[i].Value;
+                string lineRightText = ApplyTextStyles(printDetail[i + 1].DisplayLabel, TextStyling.bold) + ": " + printDetail[i + 1].Value;
                 rawTextString.AppendFormat($"{{0,-{eachSideWidth}}}{{1,{eachSideWidth}}}\x0A", lineLeftText, lineRightText);
                 CheckPageEnd();
             }
@@ -192,10 +192,10 @@ namespace GenerateRawTextToPrint
             //     string rowData= property.ToString().PadRight(totalColWidth)+crlf;
             //     rawTextString.Append(rowData);
             // }
-            string subTotal = (ApplyTextStyles("Sub Total: ",TextStyling.Bold)+billTotal.SubTotal.ToString()).PadLeft(totalColWidth)+crlf;
-            string dis= (ApplyTextStyles("Discount %: ",TextStyling.Bold)+billTotal.Dis.ToString()).PadLeft(totalColWidth)+crlf;
-            string totalAmt= (ApplyTextStyles("Total Amount: ",TextStyling.Bold)+billTotal.NetTotal.ToString()).PadLeft(totalColWidth)+crlf;
-            string amtInWords = (ApplyTextStyles("Amount In Words: ",TextStyling.Bold)+billTotal.AmountInWords).PadLeft(totalColWidth)+crlf;
+            string subTotal = (ApplyTextStyles("Sub Total: ",TextStyling.bold)+billTotal.SubTotal.ToString()).PadLeft(totalColWidth)+crlf;
+            string dis= (ApplyTextStyles("Discount %: ",TextStyling.bold)+billTotal.Dis.ToString()).PadLeft(totalColWidth)+crlf;
+            string totalAmt= (ApplyTextStyles("Total Amount: ",TextStyling.bold)+billTotal.NetTotal.ToString()).PadLeft(totalColWidth)+crlf;
+            string amtInWords = (ApplyTextStyles("Amount In Words: ",TextStyling.bold)+billTotal.AmountInWords).PadLeft(totalColWidth)+crlf;
 
             rawTextString.Append(subTotal);
             CheckPageEnd();
@@ -211,15 +211,42 @@ namespace GenerateRawTextToPrint
             StringBuilder lineText = new StringBuilder(text);
             switch (styling)
             {
-                case TextStyling.Bold:
+                case TextStyling.bold:
                     lineText.Insert(0, "\x1B\x45");
                     lineText.Append("\x1B\x46");
                     break;
-                case TextStyling.Italic:
+                case TextStyling.italic:
                     lineText.Insert(0, "\x1B\x34");
                     lineText.Append("\x1B\x35");
                     break;
-                
+                case TextStyling.double_strike:
+                    lineText.Insert(0, "\x1B\x47");
+                    lineText.Append("\x1B\x48");
+                    break;
+                case TextStyling.proportionalMode:
+                    lineText.Insert(0, "\x1B\x70\x31");
+                    lineText.Append("\x1B\x70\x30");
+                    break;
+                case TextStyling.codensed:
+                    lineText.Insert(0, "\x0F");
+                    lineText.Append("\x12");
+                    break;
+                case TextStyling.doubleWidth:
+                    lineText.Insert(0, "\x0E");
+                    lineText.Append("\x14");
+                    break;
+                case TextStyling.superScript:
+                    lineText.Insert(0, "\x1B\x53\x30");
+                    lineText.Append("\x1B\x54");
+                    break;
+                case TextStyling.subScript:
+                    lineText.Insert(0, "\x1B\x53\x31");
+                    lineText.Append("\x1B\x54");
+                    break;
+                case TextStyling.doubleHeight:
+                    lineText.Insert(0, "\x1B\x77\x31");
+                    lineText.Append("\x1B\x77\x30");
+                    break;
                 default:
                     break;
             }
@@ -228,8 +255,16 @@ namespace GenerateRawTextToPrint
 
         private enum TextStyling
         {
-            Bold,
-            Italic
+            bold,
+            italic,
+            // emphasized, == bold
+            double_strike,
+            proportionalMode,
+            codensed,
+            doubleWidth,
+            doubleHeight,
+            superScript,
+            subScript,
         }
         /// <summary>
         /// Wraps text to a specified column width.
@@ -346,3 +381,18 @@ namespace GenerateRawTextToPrint
         }
     }
 }
+    // string emphasized= "\x1B\x45";
+    // string emphasizedCancel = "\x1B\x46";
+    // string double_strike= "\x1B\x47";
+    // string double_strike_cancel = "\x1B\x48";
+    // string proportionalMode = "\x1B\x70\x31";
+    // string proportionalModeCancel = "\x1B\x70\x30";
+    // string condensed ="\x0F";
+    // string cancelCondensed = "\x12";
+    // string doubleWidth = "\x0E";
+    // string doublWidthCancel ="\x14";
+    // string superScript = "\x1B\x53\x30";
+    // string subScript ="\x1B\x53\x31";
+    // string normalizeCommand = "\x1B\x54";
+    // string doubleHeight= "\x1B\x77\x31";
+    // string doubleHeightCancel = "\x1B\x77\x30";

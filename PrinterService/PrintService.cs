@@ -234,7 +234,6 @@
             SetYMargin();
             SelectFont();
             _printer.SendCommand(printText + crlf);
-            _printer.SendCommand("Hello                     "+crlf);
             _printer.SendCommand("\x0C");
             InitializePrinter();
             // _printer.SendCommand(emphasized+"A quick brown fox jumps"+emphasizedCancel+" over the lazy dog."+crlf);
@@ -292,21 +291,6 @@
             return (int)footerLines + 1;
         }
         #endregion
-    string emphasized= "\x1B\x45";
-    string emphasizedCancel = "\x1B\x46";
-    string double_strike= "\x1B\x47";
-    string double_strike_cancel = "\x1B\x48";
-    string proportionalMode = "\x1B\x70\x31";
-    string proportionalModeCancel = "\x1B\x70\x30";
-    string condensed ="\x0F";
-    string cancelCondensed = "\x12";
-    string doubleWidth = "\x0E";
-    string doublWidthCancel ="\x14";
-    string superScript = "\x1B\x53\x30";
-    string subScript ="\x1B\x53\x31";
-    string normalizeCommand = "\x1B\x54";
-    string doubleHeight= "\x1B\x77\x31";
-    string doubleHeightCancel = "\x1B\x77\x30";
     
     }
 }
