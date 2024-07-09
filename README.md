@@ -32,8 +32,10 @@ git clone https://github.com/yourusername/InvoiceService.git
 cd InvoiceService 
 ```
 Make sure you have required dependencies (dotnet 8.0, Newtonsoft.json)
-You can add the dependencies via NuGet
-- dotnet add package Newtonsoft.Json
+You can add the dependencies via 
+```
+dotnet add package Newtonsoft.Json
+```
 Just that's it.
 
 ## Program Usage
