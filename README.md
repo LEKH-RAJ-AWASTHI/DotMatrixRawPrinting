@@ -146,3 +146,5 @@ var BillTotalDetail= @"{
             'AmountInWords':'One Thousand Two Hundred and Fifty only'
             }";
 ```
+
+You can update those data as per your requirement but the format should be same.
