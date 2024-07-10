@@ -84,7 +84,7 @@ public partial class Printer
         /// The name of the output file.
         /// </summary>
         [MarshalAs(UnmanagedType.LPStr)]
-        public string pOutputFile;
+        public string pOutputFile="";
 
         /// <summary>
         /// The data type of the document.

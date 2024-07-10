@@ -7,7 +7,7 @@ public class PrinterConfig
     /// <summary>
     /// Name of the printer
     /// </summary>
-    public string PrinterName {get; set;}
+    public string PrinterName {get; set;}= "";
     /// <summary>
     /// Page Length measured in Millimeter
     /// </summary>
