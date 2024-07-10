@@ -34,8 +34,8 @@ namespace GenerateRawTextToPrint
         /// CRLF is short form of carriage return and line feed.
         /// </summary>
         private readonly string crlf = string.Format("\x0D\x0A");
-        private string HeaderData;
-        private string FooterData;
+        private string? HeaderData="";
+        private string? FooterData="";
         private StringBuilder rawTextString = new StringBuilder();
 
         /// <summary>
@@ -56,8 +56,11 @@ namespace GenerateRawTextToPrint
             numberOfLines = linesPerPage - footerLines;
             HeaderLines = headerLines;
             FooterLines = footerLines;
-            Invoice printSection = JsonConvert.DeserializeObject<Invoice>(WhatToPrint);
-
+            Invoice? printSection = JsonConvert.DeserializeObject<Invoice>(WhatToPrint);
+            if(printSection is null)
+            {
+                return "Print is necessary";
+            }
             HeaderData = printSection.Header ?headerDataJson : null;
             FooterData = printSection.Footer ?footerDataJson: null;
 
@@ -65,7 +68,19 @@ namespace GenerateRawTextToPrint
             var patientAndInvoiceInfoSectionSettings = printSection.CustomerDetail ? JsonConvert.DeserializeObject<Dictionary<string, FieldSetting>>(patientAndInvoiceInfoSettings): null;
             var InvoiceFieldWidth = printSection.InvoiceItem ? JsonConvert.DeserializeObject<Dictionary<string, int>>(invoiceItemCharacterWidth): null;
             var invoiceItems = printSection.InvoiceItem ? JsonConvert.DeserializeObject(invoiceItemsData): null;
-            BillTotal billTotal = printSection.TotalAmount ? JsonConvert.DeserializeObject<BillTotal>(BillTotalDetail): null;
+            BillTotal? billTotal = printSection.TotalAmount ? JsonConvert.DeserializeObject<BillTotal>(BillTotalDetail): null;
+            if(invoiceItems is null)
+            {
+                return "Invoice item is required in creating invoice";
+            }
+            if(billTotal is null)
+            {
+                return "Bill Total Information is required";
+            }
+            if(InvoiceFieldWidth is null)
+            {
+                return "InvoiceFieldWidth is required";
+            }
 
             // checking if the invoiceItemCharacterWidth is exceeding printable character width
             if (InvoiceFieldWidth.Values.Sum() > printableCharacters)

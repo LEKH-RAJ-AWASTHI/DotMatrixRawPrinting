@@ -215,6 +215,10 @@ var BillTotalDetail = @"{
             'AmountInWords':'One Thousand Two Hundred and Fifty only'
             }";
 
+if(PrinterSetting is null)
+{
+    Console.WriteLine("Printer Setting is required for printer configuration");
+}
 PrinterConfig pConfig = JsonConvert.DeserializeObject<PrinterConfig>(PrinterSetting);
 PrintService setPrinter = new PrintService(pConfig);
 int linesPerPage = setPrinter.NumberOfLinesPerPage();

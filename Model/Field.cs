@@ -15,11 +15,11 @@ public class Field
     /// <summary>
     /// Field Name such as Name, address etc
     /// </summary>
-    public string DisplayLabel { get; set; }
+    public string DisplayLabel { get; set; }="";
     /// <summary>
     /// Value of display label
     /// </summary>
-    public string Value { get; set; }
+    public string Value { get; set; }="";
 }
 
 /// <summary>
@@ -30,7 +30,7 @@ public class FieldSetting
     /// <summary>
     /// Display order of the displayLabel
     /// </summary>
-    public string DisplaySeq { get; set; }
+    public string DisplaySeq { get; set; } ="";
 }
 public class Header
 {
