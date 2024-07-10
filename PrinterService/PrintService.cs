@@ -232,7 +232,7 @@
             SetRightMargin();
             SetPageLength();
             SetYMargin();
-            SelectFont();
+            // SelectFont();
             _printer.SendCommand(printText + crlf);
             _printer.SendCommand("\x0C");
             InitializePrinter();
@@ -291,6 +291,5 @@
             return (int)footerLines + 1;
         }
         #endregion
-    
     }
 }

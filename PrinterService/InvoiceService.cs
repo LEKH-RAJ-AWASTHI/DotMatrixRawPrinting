@@ -34,6 +34,8 @@ namespace GenerateRawTextToPrint
         /// CRLF is short form of carriage return and line feed.
         /// </summary>
         private readonly string crlf = string.Format("\x0D\x0A");
+        private string HeaderData;
+        private string FooterData;
         private StringBuilder rawTextString = new StringBuilder();
 
         /// <summary>
@@ -48,20 +50,24 @@ namespace GenerateRawTextToPrint
         /// <param name="headerLines">Number of header lines.</param>
         /// <param name="footerLines">Number of footer lines.</param>
         /// <returns>Raw text string for the invoice.</returns>
-        public string GenerateInvoiceRawText(string patientAndInvoiceInfo, string patientAndInvoiceInfoSettings, string invoiceItemsData, int linesPerPage, int printableCharacters, string invoiceItemCharacterWidth, int headerLines, int footerLines, string BillTotalDetail)
+        public string GenerateInvoiceRawText(string WhatToPrint, string patientAndInvoiceInfo, string patientAndInvoiceInfoSettings, string invoiceItemsData, int linesPerPage, int printableCharacters, string invoiceItemCharacterWidth, int headerLines, int footerLines, string BillTotalDetail, string headerDataJson, string footerDataJson)
         {
             LinePrintableCharacters = printableCharacters;
             numberOfLines = linesPerPage - footerLines;
             HeaderLines = headerLines;
             FooterLines = footerLines;
+            Invoice printSection = JsonConvert.DeserializeObject<Invoice>(WhatToPrint);
 
-            var patientAndInvoiceInfoData = JsonConvert.DeserializeObject<Dictionary<string, Field>>(patientAndInvoiceInfo);
-            var patientAndInvoiceInfoSectionSettings = JsonConvert.DeserializeObject<Dictionary<string, FieldSetting>>(patientAndInvoiceInfoSettings);
-            var InvoiceFieldWidth = JsonConvert.DeserializeObject<Dictionary<string, int>>(invoiceItemCharacterWidth);
-            var invoiceItems = JsonConvert.DeserializeObject(invoiceItemsData);
-            BillTotal billTotal = JsonConvert.DeserializeObject<BillTotal>(BillTotalDetail);
+            HeaderData = printSection.Header ?headerDataJson : null;
+            FooterData = printSection.Footer ?footerDataJson: null;
 
-            //checking if the invoiceItemCharacterWidth is exceeding printable character width
+            var patientAndInvoiceInfoData = printSection.CustomerDetail ? JsonConvert.DeserializeObject<Dictionary<string, Field>>(patientAndInvoiceInfo): null;
+            var patientAndInvoiceInfoSectionSettings = printSection.CustomerDetail ? JsonConvert.DeserializeObject<Dictionary<string, FieldSetting>>(patientAndInvoiceInfoSettings): null;
+            var InvoiceFieldWidth = printSection.InvoiceItem ? JsonConvert.DeserializeObject<Dictionary<string, int>>(invoiceItemCharacterWidth): null;
+            var invoiceItems = printSection.InvoiceItem ? JsonConvert.DeserializeObject(invoiceItemsData): null;
+            BillTotal billTotal = printSection.TotalAmount ? JsonConvert.DeserializeObject<BillTotal>(BillTotalDetail): null;
+
+            // checking if the invoiceItemCharacterWidth is exceeding printable character width
             if (InvoiceFieldWidth.Values.Sum() > printableCharacters)
             {
                 return "Column width exceeds the printable characters in a line";
@@ -72,7 +78,7 @@ namespace GenerateRawTextToPrint
                 return string.Empty;
             }
 
-            return BuildRawInvoiceText(patientAndInvoiceInfoData, patientAndInvoiceInfoSectionSettings, invoiceItems, printableCharacters, InvoiceFieldWidth, billTotal);
+            return BuildRawInvoiceText(HeaderData, patientAndInvoiceInfoData, patientAndInvoiceInfoSectionSettings, invoiceItems, printableCharacters, InvoiceFieldWidth, billTotal, FooterData);
         }
         /// <summary>
         /// Builds the raw text for an invoice.
@@ -83,9 +89,20 @@ namespace GenerateRawTextToPrint
         /// <param name="printableCharacters">Number of printable characters per line.</param>
         /// <param name="invoiceFieldColumnWidth">Dictionary containing column width for invoice items.</param>
         /// <returns>Raw text string for the invoice.</returns>
-        private string BuildRawInvoiceText(Dictionary<string, Field> data, Dictionary<string, FieldSetting> settings, dynamic invoiceItems, int printableCharacters, Dictionary<string, int> invoiceFieldColumnWidth, BillTotal billTotal)
+        private string BuildRawInvoiceText(string header, Dictionary<string, Field> data, Dictionary<string, FieldSetting> settings, dynamic invoiceItems, int printableCharacters, Dictionary<string, int> invoiceFieldColumnWidth, BillTotal billTotal, string footer)
         {
-            PrintHeader(crlf, HeaderLines);
+            if(data is null || settings is null || invoiceItems is null)
+            {
+                return  rawTextString.ToString();
+            }
+            if(header is null)
+            {
+                PrintHeaderOrFooter(crlf, HeaderLines);
+            }
+            else
+            {
+                PrintHeaderOrFooter(header, HeaderLines);
+            }
 
             // Create a list of items with position and sequence
             var printItems = data.Select(d => new
@@ -99,8 +116,10 @@ namespace GenerateRawTextToPrint
             PrintPatientDetails(printItems, printableCharacters);
 
             // Print invoice items
+
             PrintInvoiceItems(invoiceItems, printableCharacters, invoiceFieldColumnWidth);
             PrintBillTotalSection(billTotal, printableCharacters, invoiceFieldColumnWidth);
+            PrintFooter(FooterData, FooterLines);
 
             return rawTextString.ToString();
         }
@@ -112,13 +131,38 @@ namespace GenerateRawTextToPrint
 
         private void PrintPatientDetails(dynamic printDetail, int printableCharacters)
         {
+            if(printDetail is null)
+            {
+                return;
+            }
             int eachSideWidth = printableCharacters / 2;
-
             for (int i = 0; i < printDetail.Count; i += 2)
             {
-                string lineLeftText = ApplyTextStyles(printDetail[i].DisplayLabel, TextStyling.bold) + ": " + printDetail[i].Value;
-                string lineRightText = ApplyTextStyles(printDetail[i + 1].DisplayLabel, TextStyling.bold) + ": " + printDetail[i + 1].Value;
-                rawTextString.AppendFormat($"{{0,-{eachSideWidth}}}{{1,{eachSideWidth}}}\x0A", lineLeftText, lineRightText);
+                // string lineLeftText = ApplyTextStyles(printDetail[i].DisplayLabel, TextStyling.bold) + ": " + printDetail[i].Value;
+                // string lineRightText = ApplyTextStyles(printDetail[i + 1].DisplayLabel, TextStyling.bold) + ": " + printDetail[i + 1].Value;
+                // Console.WriteLine(rawTextString.ToString());
+                // rawTextString.AppendFormat($"{{0,-{eachSideWidth}}}{{1,{eachSideWidth}}}\x0A", lineLeftText, lineRightText);
+                // Console.WriteLine(rawTextString.ToString());
+                string lineLeftText = $"{printDetail[i].DisplayLabel}: {printDetail[i].Value}";
+                string lineRightText = string.Empty;
+
+                if (i + 1 < printDetail.Count)
+                {
+                    lineRightText = $"{printDetail[i + 1].DisplayLabel}: {printDetail[i + 1].Value}";
+                }
+
+                // Format the text with spaces
+                string formattedText = string.Format($"{{0,-{eachSideWidth}}}{{1,{eachSideWidth}}}\x0A", lineLeftText, lineRightText);
+
+                // Apply styling to the text
+                string styledText = formattedText;
+                styledText = styledText.Replace(printDetail[i].DisplayLabel, ApplyTextStyles(printDetail[i].DisplayLabel, TextStyling.bold));
+
+                if (i + 1 < printDetail.Count)
+                {
+                    styledText = styledText.Replace(printDetail[i + 1].DisplayLabel, ApplyTextStyles(printDetail[i + 1].DisplayLabel, TextStyling.bold));
+                }
+                rawTextString.Append(styledText);
                 CheckPageEnd();
             }
         }
@@ -131,6 +175,10 @@ namespace GenerateRawTextToPrint
 
         private void PrintInvoiceItems(dynamic invoiceItems, int printableCharacters, Dictionary<string, int> colWidth)
         {
+            if(invoiceItems is null)
+            {
+                return;
+            }
             int TotalAmt = 0;
             if (invoiceItems is not null && invoiceItems.Count > 0)
             {
@@ -184,6 +232,10 @@ namespace GenerateRawTextToPrint
 
         private void PrintBillTotalSection(BillTotal billTotal, int printableCharacters, Dictionary<string, int> colWidth)
         {
+            if(billTotal is null)
+            {
+                return;
+            }
             int totalColWidth = colWidth.Values.Sum();
             // Type type = typeof(BillTotal);
             // PropertyInfo[] properties= type.GetProperties();
@@ -314,9 +366,25 @@ namespace GenerateRawTextToPrint
             if (numberOfLines <= currentLine)
             {
                 rawTextString.AppendLine(@$"Continue{crlf}");
-                PrintFooter(crlf, FooterLines);
+                //printing footer
+                if(FooterData is null)
+                {
+                    PrintHeaderOrFooter(crlf, FooterLines);
+                }
+                else
+                {
+                    PrintHeaderOrFooter(FooterData, FooterLines);
+                }
                 rawTextString.AppendLine("\x0C");
-                PrintHeader(crlf, HeaderLines);
+                Console.WriteLine("page end");
+                if(HeaderData is null)
+                {
+                    PrintHeaderOrFooter(crlf, HeaderLines);
+                }
+                else
+                {
+                    PrintHeaderOrFooter(HeaderData, HeaderLines);
+                }
                 rawTextString.AppendLine("Continue");
                 currentLine = 1;
             }
@@ -344,14 +412,102 @@ namespace GenerateRawTextToPrint
         /// <param name="headerContent">Header content.</param>
         /// <param name="numberOfLines">Number of header lines.</param>
         //To do: PrintHeader for now is only adding blank lines but when other parameter come then it can become a big function to print the whole header
-        private void PrintHeader(string headerContent, int numberOfLines)
+        private void PrintHeaderOrFooter(string headerContent, int numberOfLines)
         {
-            rawTextString.Append(CenterAlignText(headerContent, LinePrintableCharacters) + crlf);
-            for (int i = 0; i < numberOfLines - 1; i++)
+            if(headerContent == crlf)
             {
                 rawTextString.Append(CenterAlignText(headerContent, LinePrintableCharacters) + crlf);
+                for (int i = 0; i < numberOfLines - 1; i++)
+                {
+                    rawTextString.Append(CenterAlignText(headerContent, LinePrintableCharacters) + crlf);
+                }
+                currentLine += numberOfLines;
             }
-            currentLine += numberOfLines;
+            else
+            {
+                int leftWidth = LinePrintableCharacters * 25 / 100;
+                int rightWidth = LinePrintableCharacters * 25 / 100;
+                int centerWidth = LinePrintableCharacters - leftWidth - rightWidth;
+                Header headerData = JsonConvert.DeserializeObject<Header>(headerContent);
+                int maxLength = Math.Max(headerData.Left.Length, Math.Max(headerData.Center.Length, headerData.Right.Length));
+
+                for (int i = 0; i < maxLength; i++)
+                {
+                    string leftText = i< headerData.Left.Length && headerData.Left[i].Value.Length > 0 ? ApplyTextStyles(headerData.Left[i].Value, TextStyling.bold).PadRight(leftWidth) :BlankSpaces(leftWidth);
+                    string centerText = i< headerData.Center.Length && headerData.Center[i].Value.Length > 0 ? ApplyTextStyles(CenterAlignText(headerData.Center[i].Value,centerWidth), TextStyling.bold) :BlankSpaces(centerWidth);
+                    string rightText = i< headerData.Right.Length && headerData.Right[i].Value.Length > 0 ? ApplyTextStyles(headerData.Right[i].Value, TextStyling.bold).PadLeft(rightWidth) :BlankSpaces(rightWidth);
+                    // string leftText = i< headerData.Left.Length ? ApplyTextStyles(headerData.Left[i].Value, TextStyling.bold) : BlankSpaces(leftWidth);
+                    // string centerText = i< headerData.Center.Length ? ApplyTextStyles(headerData.Center[i].Value, TextStyling.bold) : BlankSpaces(centerWidth);
+                    // string rightText = i< headerData.Right.Length ? ApplyTextStyles(headerData.Right[i].Value, TextStyling.bold) : BlankSpaces(rightWidth);
+                    // rawTextString.AppendFormat($"{{0, -{leftWidth}}}{{1}}{{2,{rightWidth}}}", leftText, CenterAlignText(centerText, centerWidth), rightText);
+                    rawTextString.Append(leftText);
+                    rawTextString.Append(centerText);
+                    rawTextString.Append(rightText);
+
+                    rawTextString.Append(crlf);
+
+                    currentLine++;
+                }
+            }
+        }
+        private string BlankSpaces(int numberOfSpaces)
+        {
+            string s = new string(' ', numberOfSpaces);
+            return s;
+        }
+       
+        public static string HeaderApplyStyling(string text, string styles)
+        {
+            StringBuilder lineText = new StringBuilder(text);
+            string[] stylings = styles.Split(';');
+
+            foreach (var style in stylings)
+            {
+                string trimmedStyle = style.Trim().ToLower();
+                switch (trimmedStyle)
+                {
+                    case "bold":
+                        lineText.Insert(0, "\x1B\x45");
+                        lineText.Append("\x1B\x46");
+                        break;
+                    case "italic":
+                        lineText.Insert(0, "\x1B\x34");
+                        lineText.Append("\x1B\x35");
+                        break;
+                    // case TextStyling.double_strike:
+                    //     lineText.Insert(0, "\x1B\x47");
+                    //     lineText.Append("\x1B\x48");
+                    //     break;
+                    // case TextStyling.proportionalMode:
+                    //     lineText.Insert(0, "\x1B\x70\x31");
+                    //     lineText.Append("\x1B\x70\x30");
+                    //     break;
+                    // case TextStyling.codensed:
+                    //     lineText.Insert(0, "\x0F");
+                    //     lineText.Append("\x12");
+                    //     break;
+                    case "doublewidth":
+                        lineText.Insert(0, "\x0E");
+                        lineText.Append("\x14");
+                        break;
+                    // case TextStyling.superScript:
+                    //     lineText.Insert(0, "\x1B\x53\x30");
+                    //     lineText.Append("\x1B\x54");
+                    //     break;
+                    // case TextStyling.subScript:
+                    //     lineText.Insert(0, "\x1B\x53\x31");
+                    //     lineText.Append("\x1B\x54");
+                    //     break;
+                    case "doubleheight":
+                        lineText.Insert(0, "\x1B\x77\x31");
+                        lineText.Append("\x1B\x77\x30");
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return lineText.ToString();
         }
         /// <summary>
         /// Prints the footer.
@@ -360,12 +516,18 @@ namespace GenerateRawTextToPrint
         /// <param name="numberOfLines">Number of footer lines.</param>
         //To do: PrintFooter for now is only adding blank lines but when other parameter come then it can become a big function to print the whole footer
 
-        private void PrintFooter(string footerContent, int numberOfLines)
+        private void PrintFooter(string footerContent, int footerLines)
         {
-            rawTextString.Append(CenterAlignText(footerContent, LinePrintableCharacters) + crlf);
-            for (int i = 0; i < numberOfLines - 1; i++)
+            if(numberOfLines- currentLine > footerLines)
             {
-                rawTextString.Append(CenterAlignText(footerContent, LinePrintableCharacters) + crlf);
+                    if(footerContent is null)
+                    {
+                        PrintHeaderOrFooter(crlf, footerLines);
+                    }
+                    else
+                    {
+                        PrintHeaderOrFooter(footerContent, footerLines);
+                    }
             }
         }
         /// <summary>
@@ -376,8 +538,16 @@ namespace GenerateRawTextToPrint
         /// <returns>Centered text.</returns>
         private static string CenterAlignText(string text, int width)
         {
-            int padding = (width - text.Length) / 2;
-            return text.PadLeft(padding).PadRight(padding);
+            if (text.Length >= width)
+        {
+            return text; // If the text is longer than the width, just return the text
+        }
+
+        int leftPadding = (width - text.Length) / 2;
+        int rightPadding = width - text.Length - leftPadding;
+
+        string paddedText = new string(' ', leftPadding) + text + new string(' ', rightPadding);
+        return paddedText;
         }
     }
 }

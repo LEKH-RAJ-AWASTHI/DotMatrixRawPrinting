@@ -11,7 +11,7 @@ using PrintingRaw;
 var PrinterSetting = @"{
                     'PrinterName': 'EPSON LQ-310 ESC/P2',
                     'PageLengthMM': '210',
-                    'pageWidthMM': '230',
+                    'pageWidthMM': '200',
                     'LeftMarginMM': '10',
                     'RightMarginMM': '10',
                     'TopMarginMM': '15',
@@ -21,6 +21,43 @@ var PrinterSetting = @"{
                     'HeaderHeightMM': '10',
                     'FooterHeightMM': '10'
     }";
+
+var WhatToPrint = @"{
+    'Header' : 'true',
+    'CustomerDetail' : 'true',
+    'InvoiceItem' : 'true',
+    'TotalAmount' : 'true',
+    'Footer' : 'false'
+}";
+var HeaderData = @"{
+    ""left"": [
+        { ""value"": """" }
+    ],
+    ""center"": [
+        { ""value"": ""abc org"" },
+        { ""value"": ""01-5448658"" },
+        { ""value"": ""Dillibazar, Kathmandu"" }
+    ],
+    ""right"": [
+        { ""value"": """" },
+        { ""value"": ""PAN NO. 789654123"" }
+    ]
+}";
+
+var FooterData = @"{
+    ""left"": [
+        { ""value"": """" }
+    ],
+    ""center"": [
+        { ""value"": ""01-5448658"" }
+    ],
+    ""right"": [
+        { ""value"": ""PAN NO. 789654123"" }
+    ]
+}";
+
+
+
 var patientAndinvoiceDetails = @"{
 				'HospitalNo': { 'DisplayLabel': 'HospitalNo', 'value': '24000624' },
 				'PatientName': { 'DisplayLabel': 'PatientName', 'value': 'Monday New Patient' },
@@ -52,7 +89,7 @@ var patientAndInvoiceSettings = @"{
     'PaymentMode': {'DisplaySeq': '10' }
 }";
 
-var InvoiceItemCharacterWidth= @"
+var InvoiceItemCharacterWidth = @"
 {
     ""SN"": 5,
     ""Particular"": 30,
@@ -78,33 +115,105 @@ var invoiceItemsData = @"[
     ""Dis%"":0,
     ""DisAmt"": 0,
     ""TotalAmt"": 250
-}]
-// {
-//     ""SN"": 3,
-//     ""Particular"": ""Bili fgd fgdf fdh dgd"",
-//     ""Qty"": 1,
-//     ""Dis%"":0,
-//     ""DisAmt"": 0,
-//     ""TotalAmt"": 250
-// },
-// {
-//     ""SN"": 4,
-//     ""Particular"": ""X-Ray lkjd jalkjdsgsdgc lkjalk"",
-//     ""Qty"": 1,
-//     ""Dis%"":0,
-//     ""DisAmt"": 0,
-//     ""TotalAmt"": 250
-// },
-// {
-//     ""SN"": 5,
-//     ""Particular"": ""Ultra Sound ./dflks lkja"",
-//     ""Qty"": 1,
-//     ""Dis%"":0,
-//     ""DisAmt"": 0,
-//     ""TotalAmt"": 250
-// }]";
+},
+{
+    ""SN"": 3,
+    ""Particular"": ""Bili fgd fgdf fdh dgd"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 4,
+    ""Particular"": ""X-Ray lkjd jalkjdsgsdgc lkjalk"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 2,
+    ""Particular"": ""RFT kjhdh khieoi ioejojl"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 3,
+    ""Particular"": ""Bili fgd fgdf fdh dgd"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 4,
+    ""Particular"": ""X-Ray lkjd jalkjdsgsdgc lkjalk"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 2,
+    ""Particular"": ""RFT kjhdh khieoi ioejojl"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 3,
+    ""Particular"": ""Bili fgd fgdf fdh dgd"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 4,
+    ""Particular"": ""X-Ray lkjd jalkjdsgsdgc lkjalk"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 2,
+    ""Particular"": ""RFT kjhdh khieoi ioejojl"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 3,
+    ""Particular"": ""Bili fgd fgdf fdh dgd"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 4,
+    ""Particular"": ""X-Ray lkjd jalkjdsgsdgc lkjalk"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+},
+{
+    ""SN"": 5,
+    ""Particular"": ""Ultra Sound ./dflks lkja"",
+    ""Qty"": 1,
+    ""Dis%"":0,
+    ""DisAmt"": 0,
+    ""TotalAmt"": 250
+}]";
 
-var BillTotalDetail= @"{
+var BillTotalDetail = @"{
             'SubTotal': '1250',
             'Dis': '0',
             'NetTotal': '1250',
@@ -122,11 +231,11 @@ var BillTotalDetail= @"{
 PrinterConfig pConfig = JsonConvert.DeserializeObject<PrinterConfig>(PrinterSetting);
 PrintService setPrinter = new PrintService(pConfig);
 int linesPerPage = setPrinter.NumberOfLinesPerPage();
-int printableCharacters=setPrinter.NumberOfPrintableCharacters();
+int printableCharacters = setPrinter.NumberOfPrintableCharacters();
 int headerLines = setPrinter.HeaderHeightLines();
 int footerLines = setPrinter.FooterHeightLines();
 
 InvoiceService invoiceService = new InvoiceService();
-string invoiceText = invoiceService.GenerateInvoiceRawText(patientAndinvoiceDetails, patientAndInvoiceSettings, invoiceItemsData, linesPerPage, printableCharacters, InvoiceItemCharacterWidth, headerLines, footerLines, BillTotalDetail);	
+string invoiceText = invoiceService.GenerateInvoiceRawText(WhatToPrint, patientAndinvoiceDetails, patientAndInvoiceSettings, invoiceItemsData, linesPerPage, printableCharacters, InvoiceItemCharacterWidth, headerLines, footerLines, BillTotalDetail, HeaderData, FooterData);
 Console.WriteLine(invoiceText);
 setPrinter.PrintRawText(invoiceText);
