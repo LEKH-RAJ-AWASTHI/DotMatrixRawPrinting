@@ -95,6 +95,7 @@ namespace GenerateRawTextToPrint
             {
                 return  rawTextString.ToString();
             }
+            // if header is null then you have to print blank lines in the place of header
             if(header is null)
             {
                 PrintHeaderOrFooter(crlf, HeaderLines);
@@ -136,13 +137,10 @@ namespace GenerateRawTextToPrint
                 return;
             }
             int eachSideWidth = printableCharacters / 2;
+
+            //Modification explained: earlier here is a logic that place text styling first and then spacing the text in given length. That arise a problem that when printing those styling doesn't take the spaces it only adds styling so the formatting of text become wrong. Now I added spacing first and then added styling
             for (int i = 0; i < printDetail.Count; i += 2)
             {
-                // string lineLeftText = ApplyTextStyles(printDetail[i].DisplayLabel, TextStyling.bold) + ": " + printDetail[i].Value;
-                // string lineRightText = ApplyTextStyles(printDetail[i + 1].DisplayLabel, TextStyling.bold) + ": " + printDetail[i + 1].Value;
-                // Console.WriteLine(rawTextString.ToString());
-                // rawTextString.AppendFormat($"{{0,-{eachSideWidth}}}{{1,{eachSideWidth}}}\x0A", lineLeftText, lineRightText);
-                // Console.WriteLine(rawTextString.ToString());
                 string lineLeftText = $"{printDetail[i].DisplayLabel}: {printDetail[i].Value}";
                 string lineRightText = string.Empty;
 
@@ -179,7 +177,6 @@ namespace GenerateRawTextToPrint
             {
                 return;
             }
-            int TotalAmt = 0;
             if (invoiceItems is not null && invoiceItems.Count > 0)
             {
                 rawTextString.AppendLine("\n");
@@ -199,28 +196,19 @@ namespace GenerateRawTextToPrint
                 // Print data rows
                 foreach (var item in invoiceItems)
                 {
-                    // List<string> rowData = new List<string>();
-                    // var rowData= headers.ToDictionary(header=> header, header => WrapTextToWidth(item[header].ToString(), colWidth[header], lea));
+
                     Dictionary<string, string> rowData = new Dictionary<string, string>();
                     int leadingSpaces = 0;
                     foreach (var prop in headers)
                     {
                         rowData.Add(prop, WrapTextToWidth(item[prop].ToString(), colWidth[prop], leadingSpaces));
                         leadingSpaces += colWidth[prop];
-                        if (prop.ToString() == "TotalAmt")
-                        {
-                            TotalAmt += (int)item[prop];
-                        }
+
                     }
                     // FormatInvoiceRow(rowData.ToArray(),printableCharacters, colWidth);
                     rawTextString.Append(Helper.FormatRow(rowData, printableCharacters, colWidth));
                     CheckPageEnd();
                 }
-                // int totalWidth= colWidth.Sum(kv => kv.Value); // calculates the total width of the column in the invoice item.
-                // int eachSideWidth = totalWidth/2;
-                // string lineLeftText = ApplyTextStyles("Total Amount", TextStyling.Bold) + ": ";
-                // // string lineRightText = ApplyTextStyles(TotalAmt.ToString(), TextStyling.Bold);
-                // rawTextString.AppendFormat($"{{0,{totalWidth}}}\x0A", lineLeftText+ TotalAmt);
             }
         }
         /// <summary>
@@ -237,13 +225,7 @@ namespace GenerateRawTextToPrint
                 return;
             }
             int totalColWidth = colWidth.Values.Sum();
-            // Type type = typeof(BillTotal);
-            // PropertyInfo[] properties= type.GetProperties();
-            // foreach(PropertyInfo property in properties)
-            // {
-            //     string rowData= property.ToString().PadRight(totalColWidth)+crlf;
-            //     rawTextString.Append(rowData);
-            // }
+
             string subTotal = (ApplyTextStyles("Sub Total: ",TextStyling.bold)+billTotal.SubTotal.ToString()).PadLeft(totalColWidth)+crlf;
             string dis= (ApplyTextStyles("Discount %: ",TextStyling.bold)+billTotal.Dis.ToString()).PadLeft(totalColWidth)+crlf;
             string totalAmt= (ApplyTextStyles("Total Amount: ",TextStyling.bold)+billTotal.NetTotal.ToString()).PadLeft(totalColWidth)+crlf;
@@ -337,8 +319,6 @@ namespace GenerateRawTextToPrint
             // Base condition: if the text is shorter than the column width, return it as is
             if (text.Length <= columnWidth)
             {
-                // text = text.Trim();
-                // text = string.Format($"{{0, -{columnWidth}}}", text);
                 return text.PadRight(columnWidth);
             }
 
@@ -566,18 +546,3 @@ namespace GenerateRawTextToPrint
         }
     }
 }
-    // string emphasized= "\x1B\x45";
-    // string emphasizedCancel = "\x1B\x46";
-    // string double_strike= "\x1B\x47";
-    // string double_strike_cancel = "\x1B\x48";
-    // string proportionalMode = "\x1B\x70\x31";
-    // string proportionalModeCancel = "\x1B\x70\x30";
-    // string condensed ="\x0F";
-    // string cancelCondensed = "\x12";
-    // string doubleWidth = "\x0E";
-    // string doublWidthCancel ="\x14";
-    // string superScript = "\x1B\x53\x30";
-    // string subScript ="\x1B\x53\x31";
-    // string normalizeCommand = "\x1B\x54";
-    // string doubleHeight= "\x1B\x77\x31";
-    // string doubleHeightCancel = "\x1B\x77\x30";

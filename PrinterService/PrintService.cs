@@ -236,20 +236,8 @@
             _printer.SendCommand(printText + crlf);
             _printer.SendCommand("\x0C");
             InitializePrinter();
-            // _printer.SendCommand(emphasized+"A quick brown fox jumps"+emphasizedCancel+" over the lazy dog."+crlf);
-            // _printer.SendCommand(double_strike+"A quick brown fox jumps"+double_strike_cancel+" over the lazy dog."+crlf);
-            // _printer.SendCommand(proportionalMode+"A quick brown fox jumps"+proportionalModeCancel+" over the lazy dog."+crlf);
-            // _printer.SendCommand(condensed+"A quick brown fox jumps"+cancelCondensed+" over the lazy dog."+crlf);
-            // _printer.SendCommand(doubleWidth+"A quick brown fox jumps"+doublWidthCancel+" over the lazy dog."+crlf);
-            // _printer.SendCommand(superScript+"A quick brown fox jumps"+subScript+" over the lazy dog."+crlf);
-            // _printer.SendCommand(doubleHeight+"A quick brown fox jumps"+doubleHeightCancel+" over the lazy dog."+crlf);
-            // _printer.SendCommand("2"+superScript+"2"+normalizeCommand+ " is 4."+crlf);
-            // _printer.SendCommand("11001110101010"+subScript+"2"+normalizeCommand+" is 1973"+crlf);
+
         }
-            // _printer.SendCommand("A quick brown fox jumps over the lazy dog."+crlf);
-            // _printer.SendCommand("A quick brown fox jumps over the lazy dog."+crlf);
-            // _printer.SendCommand("A quick brown fox jumps over the lazy dog."+crlf);
-            // _printer.SendCommand("A quick brown fox jumps over the lazy dog."+crlf);
 
         #region Utility Functions
         /// <summary>

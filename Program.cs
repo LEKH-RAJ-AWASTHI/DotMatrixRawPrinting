@@ -3,11 +3,6 @@ using GenerateRawTextToPrint;
 using Newtonsoft.Json;
 using PrintingRaw;
 
-// Console.WriteLine("Hello, World!");
-// Printer printer = new Printer("EPSON LQ-310 ESC/P2");
-// string s= "Hello World\n";
-// byte[] bytes = Encoding.ASCII.GetBytes(s);
-// printer.SendCommandBytes(bytes);
 var PrinterSetting = @"{
                     'PrinterName': 'EPSON LQ-310 ESC/P2',
                     'PageLengthMM': '210',
@@ -219,15 +214,7 @@ var BillTotalDetail = @"{
             'NetTotal': '1250',
             'AmountInWords':'One Thousand Two Hundred and Fifty only'
             }";
-// var HeaderFooter=@"{
-// 	'Letterpad': {'height': '50mm', 'lineSpacing': '10'},
-// 	'Footer': {'height': '30mm', 'lineSpacing': '10'}
-// }";
-// var DisplayOrder= @"{
-//             'patientAndinvoiceDetails': '1',
-//             'invoiceItemsData': '2',
-//             'BillTotalDetail': '3'
-//         }";
+
 PrinterConfig pConfig = JsonConvert.DeserializeObject<PrinterConfig>(PrinterSetting);
 PrintService setPrinter = new PrintService(pConfig);
 int linesPerPage = setPrinter.NumberOfLinesPerPage();
