@@ -7,9 +7,6 @@ Make sure you have dotnet 8.0 installed in your device.
 
 
 
-Here is the input required and output given by the application
-![InputOutput](https://github.com/LEKH-RAJ-AWASTHI/DotMatrixRawPrinting/assets/104682699/feadbbe9-b2eb-4305-ab32-8ad43588196f)
-
 ## Features
 - Generate raw text for printing invoices.
 - Support for headers and footers in the invoice.
@@ -17,9 +14,6 @@ Here is the input required and output given by the application
 - Customizable printable characters per line and lines per page.
 - Handling of multiline invoice items and patient details.
 - Support for text styling (Bold, Italic).
-
-## Program Flow of Application
-![Program Flow of PrintingRaw](https://github.com/LEKH-RAJ-AWASTHI/DotMatrixRawPrinting/assets/104682699/6bf658f7-0dff-4147-bec8-e4862199ce9c)
 
 
 
@@ -57,6 +51,48 @@ var PrinterSetting = @"{
                     'HeaderHeightMM': '10',
                     'FooterHeightMM': '10'
     }";
+```
+### Give What to print
+```
+var WhatToPrint = @"{
+    'Header' : 'true',
+    'CustomerDetail' : 'true',
+    'InvoiceItem' : 'true',
+    'TotalAmount' : 'true',
+    'Footer' : 'false'
+}";
+```
+### Header Data
+```
+var HeaderData = @"{
+    ""left"": [
+        { ""value"": """" }
+    ],
+    ""center"": [
+        { ""value"": ""abc org"" },
+        { ""value"": ""01-5448658"" },
+        { ""value"": ""Dillibazar, Kathmandu"" }
+    ],
+    ""right"": [
+        { ""value"": """" },
+        { ""value"": ""PAN NO. 789654123"" }
+    ]
+}";
+```
+### Footer Data
+```
+var FooterData = @"{
+    ""left"": [
+        { ""value"": """" }
+    ],
+    ""center"": [
+        { ""value"": ""01-5448658"" }
+    ],
+    ""right"": [
+        { ""value"": ""PAN NO. 789654123"" }
+    ]
+}";
+
 ```
 ### Customer Detail Data
 ```

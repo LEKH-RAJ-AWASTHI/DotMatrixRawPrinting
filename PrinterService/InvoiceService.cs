@@ -258,6 +258,12 @@ namespace GenerateRawTextToPrint
             rawTextString.Append(amtInWords);
             CheckPageEnd(); 
         }
+        /// <summary>
+        /// Wrap the given string in the styling variable.
+        /// </summary>
+        /// <param name="text">String in which styling is required</param>
+        /// <param name="styling">Enum variable for styling</param>
+        /// <returns></returns>
         private string ApplyTextStyles(string text, TextStyling styling)
         {
             StringBuilder lineText = new StringBuilder(text);
@@ -407,10 +413,10 @@ namespace GenerateRawTextToPrint
             CheckPageEnd();
         }
         /// <summary>
-        /// Prints the header.
+        /// Function to Print the header and footer.
         /// </summary>
-        /// <param name="headerContent">Header content.</param>
-        /// <param name="numberOfLines">Number of header lines.</param>
+        /// <param name="headerContent">Header or footer content.</param>
+        /// <param name="numberOfLines">Number of header lines or footer lines.</param>
         //To do: PrintHeader for now is only adding blank lines but when other parameter come then it can become a big function to print the whole header
         private void PrintHeaderOrFooter(string headerContent, int numberOfLines)
         {
@@ -425,8 +431,9 @@ namespace GenerateRawTextToPrint
             }
             else
             {
-                int leftWidth = LinePrintableCharacters * 25 / 100;
-                int rightWidth = LinePrintableCharacters * 25 / 100;
+                int widthInPercent= 25;
+                int leftWidth = LinePrintableCharacters * widthInPercent / 100;
+                int rightWidth = LinePrintableCharacters * widthInPercent / 100;
                 int centerWidth = LinePrintableCharacters - leftWidth - rightWidth;
                 Header headerData = JsonConvert.DeserializeObject<Header>(headerContent);
                 int maxLength = Math.Max(headerData.Left.Length, Math.Max(headerData.Center.Length, headerData.Right.Length));
@@ -436,10 +443,6 @@ namespace GenerateRawTextToPrint
                     string leftText = i< headerData.Left.Length && headerData.Left[i].Value.Length > 0 ? ApplyTextStyles(headerData.Left[i].Value, TextStyling.bold).PadRight(leftWidth) :BlankSpaces(leftWidth);
                     string centerText = i< headerData.Center.Length && headerData.Center[i].Value.Length > 0 ? ApplyTextStyles(CenterAlignText(headerData.Center[i].Value,centerWidth), TextStyling.bold) :BlankSpaces(centerWidth);
                     string rightText = i< headerData.Right.Length && headerData.Right[i].Value.Length > 0 ? ApplyTextStyles(headerData.Right[i].Value, TextStyling.bold).PadLeft(rightWidth) :BlankSpaces(rightWidth);
-                    // string leftText = i< headerData.Left.Length ? ApplyTextStyles(headerData.Left[i].Value, TextStyling.bold) : BlankSpaces(leftWidth);
-                    // string centerText = i< headerData.Center.Length ? ApplyTextStyles(headerData.Center[i].Value, TextStyling.bold) : BlankSpaces(centerWidth);
-                    // string rightText = i< headerData.Right.Length ? ApplyTextStyles(headerData.Right[i].Value, TextStyling.bold) : BlankSpaces(rightWidth);
-                    // rawTextString.AppendFormat($"{{0, -{leftWidth}}}{{1}}{{2,{rightWidth}}}", leftText, CenterAlignText(centerText, centerWidth), rightText);
                     rawTextString.Append(leftText);
                     rawTextString.Append(centerText);
                     rawTextString.Append(rightText);
@@ -450,12 +453,24 @@ namespace GenerateRawTextToPrint
                 }
             }
         }
+        /// <summary>
+        /// Returns a string with specified number of spaces
+        /// </summary>
+        /// <param name="numberOfSpaces"></param>
+        /// <returns></returns>
         private string BlankSpaces(int numberOfSpaces)
         {
             string s = new string(' ', numberOfSpaces);
             return s;
         }
        
+       /// <summary>
+       /// Function that helps to apply the styling in the header or footer. 
+       /// </summary>
+       /// <param name="text"></param>
+       /// <param name="styles"></param>
+       /// <returns></returns>
+       // For now this functions takes text to be styled and string of styles separated by semicolon(;)
         public static string HeaderApplyStyling(string text, string styles)
         {
             StringBuilder lineText = new StringBuilder(text);
@@ -510,7 +525,7 @@ namespace GenerateRawTextToPrint
             return lineText.ToString();
         }
         /// <summary>
-        /// Prints the footer.
+        /// Prints the footer after the bill printing job is finished.
         /// </summary>
         /// <param name="footerContent">Footer content.</param>
         /// <param name="numberOfLines">Number of footer lines.</param>

@@ -238,4 +238,5 @@ int footerLines = setPrinter.FooterHeightLines();
 InvoiceService invoiceService = new InvoiceService();
 string invoiceText = invoiceService.GenerateInvoiceRawText(WhatToPrint, patientAndinvoiceDetails, patientAndInvoiceSettings, invoiceItemsData, linesPerPage, printableCharacters, InvoiceItemCharacterWidth, headerLines, footerLines, BillTotalDetail, HeaderData, FooterData);
 Console.WriteLine(invoiceText);
+//sends data to printer.
 setPrinter.PrintRawText(invoiceText);
